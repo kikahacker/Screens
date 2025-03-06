@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +42,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
+import com.example.myapplication.ui.data.remote.RetrofitClient
+import com.example.myapplication.ui.data.remote.User
 import com.example.myapplication.ui.screen.singIn.AuthTextFiled
 import com.example.myapplication.ui.screen.singIn.CommonButton
 import com.example.myapplication.ui.screen.singIn.PasswordTextField
 import com.example.myapplication.ui.screen.singIn.SingInContent
 import com.example.myapplication.ui.screen.singIn.TitleWithSubtitleText
 import com.example.myapplication.ui.theme.MatuleTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
+import kotlin.coroutines.coroutineContext
 
 
 @Composable
@@ -167,11 +174,15 @@ fun SignUpContent(paddingValues: PaddingValues){
                 )
             }
         }
+        val coroutine = rememberCoroutineScope{ Dispatchers.IO}
         CommonButtonForReg(
             modifier = Modifier.padding(top = 30.dp),
-            buttonLabel = stringResource(R.string.registration)
-        ){
-        }
+            buttonLabel = stringResource(R.string.registration),
+            onClick = {
+                val user = User(userName = name.value, password = passwordReg.value, email = emailReg.value)
+                coroutine.launch{ RetrofitClient.retrofit.registration(user) }
+            }
+        )
     }
 }
 
